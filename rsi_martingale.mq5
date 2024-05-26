@@ -22,6 +22,7 @@ input int MaxSpread = 10;  // max acceptable spread
 input int MaxSlippage = 3;  // max acceptable slippage
 
 input group "Optimization Parameters"
+input ENUM_TIMEFRAMES Current_TimeFrame = PERIOD_M10;  // Current time period
 input int RSI_Period = 14;  // RSI Period
 input int RSILevel = 70;  // RSI upper bound
 input int BarsForCondition = 20;  // number of k lines to compare
@@ -118,6 +119,12 @@ void OnDeinit(const int reason){
 }
 
 void OnTick() {  
+   // run once at each bar's openPrice
+   int bars = iBars(_Symbol, Current_TimeFrame);
+   static int prevBars = 0;
+   if (bars == prevBars) return;
+   prevBars = bars;
+
    if (CopyBuffer(rsiHandle, 0, 0, BarsForCondition + 1, rsiBuffer) == -1) {
       Print("Failed to copy RSI values");
       return;
